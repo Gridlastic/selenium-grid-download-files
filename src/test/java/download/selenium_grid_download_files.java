@@ -53,21 +53,22 @@ public class selenium_grid_download_files extends TestCase {
 			
 			  int count = 1;
 		        do {
-		        	if (get_downloaded_files((RemoteWebDriver) driver).toString().contains(  (download_url.getName().substring(0,download_url.getName().indexOf(".")-1)) )){ //Note: multiple file downloads on the same grid node of the same file name will increment the file name like 50MB(2).zip 
+		        	if (get_downloaded_files((RemoteWebDriver) driver).toString().contains((download_url.getName().substring(0,download_url.getName().indexOf(".")-1)))){ //Note: multiple file downloads on the same grid node of the same file name will increment the file name like 50MB(2).zip 
 		        		System.out.println("FILE DOWNLOADED TO GRID NODE");
 		    			break;
 		    		} else {
 		    			System.out.println("DOWNLOAD PROGRESS: " + get_download_progress_all((RemoteWebDriver) driver));	
 		    		}
 		             count++;
-		             Thread.sleep(10000);
+		             Thread.sleep(5000);
 		        } while (count < 11);
 		        
 		        
 		        ArrayList downloaded_files_arraylist = get_downloaded_files((RemoteWebDriver) driver);
 		    	String content = get_file_content((RemoteWebDriver) driver,(String) downloaded_files_arraylist.get(0));// large files might need and increase in implicit wait.
-		    	 try {		    	    	
-		    	    	FileOutputStream fos = new FileOutputStream("C:\\Users\\homework\\Downloads\\gridnodes\\" + download_url .getName());  // edit to your location
+		    	 try {	
+		    		 	String home = System.getProperty("user.home");
+		    	    	FileOutputStream fos = new FileOutputStream(home+"/downloads/gridnodes/" + download_url .getName());		    	    	
 		    	        byte[] decoder = Base64.decodeBase64(content.substring(content.indexOf("base64,")+7));
 		    	        fos.write(decoder);
 		    	        System.out.println("File saved to local.");
