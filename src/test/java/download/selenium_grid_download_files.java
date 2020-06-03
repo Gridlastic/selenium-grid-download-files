@@ -20,7 +20,7 @@ public class selenium_grid_download_files extends TestCase {
 
 	 //NOTE: find these credentials in your Gridlastic dashboard after launching your selenium grid (get a free account).
 	 String video_url = System.getenv("VIDEO_URL");
-	 String hub = System.getenv("HUB"); // like "http://USERNAME:ACCESS_KEY@SUBDOMAIN.gridlastic.com/wd/hub";
+	 String hub = System.getenv("HUB"); // like "https://USERNAME:ACCESS_KEY@HUB_SUBDOMAIN.gridlastic.com/wd/hub";
 
 	 
 	 public void setUp() throws Exception {
