@@ -47,7 +47,7 @@ public class selenium_grid_download_files extends TestCase {
 	 }
 
 	 public void test_download_file() throws Exception {
-//			File download_url = new File((String) "http://ipv4.download.thinkbroadband.com/50MB.zip");	
+	//		File download_url = new File((String) "http://ipv4.download.thinkbroadband.com/50MB.zip");	
 			File download_url = new File((String) "https://static.mozilla.com/foundation/documents/mf-articles-of-incorporation.pdf");		
 			driver.get(download_url.toString());
 			
@@ -128,9 +128,11 @@ return file_content;
 					if(!remoteDriver.getCurrentUrl().startsWith("chrome://downloads")) {
 					remoteDriver.get("chrome://downloads/");
 					}
-					filesFound =  (ArrayList)  remoteDriver.executeScript("return downloads.Manager.get().items_   "
-						   + "  .filter(e => e.state === 'COMPLETE')  "
-						  +  "  .map(e => e.filePath || e.file_path); ", "");
+					filesFound =  (ArrayList)  remoteDriver.executeScript(
+					  "return  document.querySelector('downloads-manager')  "+
+				      " .shadowRoot.querySelector('#downloadsList')         "+
+				      " .items.filter(e => e.state === 'COMPLETE')          "+
+				      " .map(e => e.filePath || e.file_path || e.fileUrl || e.file_url); ","");				
 				} catch (Exception e) {
 					System.err.println(e);
 				}
