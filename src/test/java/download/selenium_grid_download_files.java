@@ -3,22 +3,28 @@ package download;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
-
+import java.util.Map;
 import org.apache.commons.codec.binary.Base64;
 import org.openqa.selenium.Platform;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.http.ClientConfig;
 
 import junit.framework.TestCase;
 
 public class selenium_grid_download_files extends TestCase {
-	 private RemoteWebDriver driver;
 
-	 //NOTE: find these credentials in your Gridlastic dashboard after launching your selenium grid (get a free account).
+	 private WebDriver driver;
+
+	 
+	 
+	 // NOTE: find these credentials in your Gridlastic dashboard after launching your selenium grid (get a free account).
+	 // This is a Selenium 4 example
 	 String video_url = System.getenv("VIDEO_URL");
 	 String hub = System.getenv("HUB"); // like "https://USERNAME:ACCESS_KEY@HUB_SUBDOMAIN.gridlastic.com/wd/hub";
 
@@ -26,28 +32,32 @@ public class selenium_grid_download_files extends TestCase {
 	 public void setUp() throws Exception {
 	     
 	 	ChromeOptions options = new ChromeOptions();
-	 	options.setCapability("version", "latest");
-	 	options.setCapability("platform", Platform.WIN10);
-	 	options.setCapability("platformName", "windows");
-	 	options.setCapability("video", "True");
-	 		 	
+	 	options.setCapability("browserVersion", "latest");
+	 	options.setCapability("platformName", Platform.WIN10);
+	 	//options.setCapability("platformName", Platform.LINUX);
+		Map<String, Object> gridlasticOptions = new HashMap<>();
+		gridlasticOptions.put("video", true);
+		options.setCapability("gridlastic:options", gridlasticOptions);
 	 	
+	 	 	
 	 	HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
         chromePrefs.put("download.prompt_for_download", Boolean.valueOf(false));
         chromePrefs.put("plugins.always_open_pdf_externally", Boolean.valueOf(true));
         chromePrefs.put("safebrowsing_for_trusted_sources_enabled", Boolean.valueOf(false));
         options.setExperimentalOption("prefs", chromePrefs);
         
-    
-	     driver = new RemoteWebDriver(
-	        new URL(hub),
-	        options);
-	     driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-	     System.out.println("GRIDLASTIC VIDEO URL: " + video_url + ((RemoteWebDriver) driver).getSessionId()); 
+
+	     ClientConfig config = ClientConfig.defaultConfig().readTimeout(Duration.ofMinutes(10));
+		 driver = RemoteWebDriver.builder().address(new URL(hub)).oneOf(options).config(config).build();
 	 }
+	 
+	 
+		
+		
 
 	 public void test_download_file() throws Exception {
-	//		File download_url = new File((String) "http://ipv4.download.thinkbroadband.com/50MB.zip");	
+			
+			//File download_url = new File((String) "http://212.183.159.230/50MB.zip"); // http://xcal1.vodafone.co.uk/
 			File download_url = new File((String) "https://static.mozilla.com/foundation/documents/mf-articles-of-incorporation.pdf");		
 			driver.get(download_url.toString());
 			
@@ -57,7 +67,7 @@ public class selenium_grid_download_files extends TestCase {
 		        		System.out.println("FILE DOWNLOADED TO GRID NODE");
 		    			break;
 		    		} else {
-		    			System.out.println("DOWNLOAD PROGRESS: " + get_download_progress_all((RemoteWebDriver) driver));	
+		    			System.out.println("DOWNLOAD PROGRESS: " + get_download_progress_all((RemoteWebDriver) driver)+"%");	
 		    		}
 		             count++;
 		             Thread.sleep(5000);
@@ -73,11 +83,12 @@ public class selenium_grid_download_files extends TestCase {
 		    	        fos.write(decoder);
 		    	        System.out.println("File saved to local.");
 		    	      } catch (Exception e) {
-		    	        e.printStackTrace();
+		    	         e.printStackTrace();
 		    	      }
 	}
 
 	 public void tearDown() throws Exception {
+		 System.out.println("GRIDLASTIC VIDEO URL: " + video_url + ((RemoteWebDriver) driver).getSessionId());
 	     driver.quit();
 	 }
 	 
